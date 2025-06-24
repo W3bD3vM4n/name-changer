@@ -1,8 +1,5 @@
+import sys
 from pathlib import Path
-
-file_names = []
-first_five = []
-counter = 0
 
 def get_nonempty_input(prompt: str) -> str:
     while True:
@@ -12,19 +9,28 @@ def get_nonempty_input(prompt: str) -> str:
         else:
             return string_fill
 
-path_string = get_nonempty_input("Enter the path to the file/folder: ")
-path = Path(path_string)
-
-if path.exists() and path.is_dir():
-    for file in path.iterdir():
-        if file.is_file():
-            file_names.append(file.name)
-            if counter < 5:
-                first_five.append(file.name)
-            counter += 1
-    print(f"\nFiles found: {len(file_names)}")
-    print(f"\nFirst five samples:")
-    for file in first_five:
-        print(file)
-else:
+path = Path(get_nonempty_input("Enter the path to the file/folder: "))
+if not (path.exists() and path.is_dir()):
     print("Invalid folder path")
+    sys.exit(1)
+    
+old_sub = get_nonempty_input("Text to replace: ")
+new_sub = input("New text: ")
+
+files = [f for f in path.iterdir() if f.is_file()]
+
+renamed = []
+for file in files:
+    new_name = file.name.replace(old_sub, new_sub)
+    if new_name == file.name:
+        continue
+    target = file.with_name(new_name)
+    file.rename(target)
+    renamed.append((file.name, new_name))
+
+print(f"\nTotal files scanned: {len(files)}")
+print(f"Files renamed: {len(renamed)}\n")
+
+print("First five renames:")
+for old, new in renamed[:5]:
+    print(f" · {old} -> {new}")
