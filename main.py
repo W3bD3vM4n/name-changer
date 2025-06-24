@@ -1,7 +1,5 @@
 from pathlib import Path
 import sys
-from xml.dom.xmlbuilder import Options
-
 
 def get_nonempty_input(prompt: str) -> str:
     while True:
